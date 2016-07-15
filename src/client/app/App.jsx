@@ -8,6 +8,9 @@ import Footer           from './Footer.jsx'
 import TaskForm         from './TaskForm.jsx'
 import TaskList         from './TaskList.jsx'
 
+import ajax             from '../helpers/ajaxAdapter.js'
+import util             from '../helpers/util.js'
+
 // create a React Component called _App_
 export default class App extends React.Component{
 
@@ -27,28 +30,52 @@ export default class App extends React.Component{
     componentDidMount(){
 
         // go to the db and get the freshest tasks
+        ajax.getTasks().then( data=>
+          // when the data comes back update the state
+        this.setState({tasks: data.indexByKey('task_id')})
+    )
 
-        // when the data comes back update the state
     }
 
     // note that classes do **not** have commas between their methods
     addTask( newTask ){
 
-        //send this change to the db (ajax)
-        newTask.task_name = newTask.name
-        newTask.task_name = newTask.desc
-        newTask.completed = false
-        newTask.task_id = Date.now()
+        // send this change to the db (ajax)
+        ajax.createTask(newTask).then( data=>{
 
-        this.state.tasks[newTask.task_id]= newTask
+         // when the data comes back, update the state.
+        this.state.tasks[data[0].task_id]= data[0]
         this.setState({tasks: this.state.tasks})
+
+        })
+
+        //send this change to the db (ajax)
+        // newTask.task_name = newTask.name
+        // newTask.task_name = newTask.desc
+        // newTask.completed = false
+        // newTask.task_id = Date.now()
+
+        // this.state.tasks[newTask.task_id]= newTask
+        // this.setState({tasks: this.state.tasks})
     }
 
+      /* TOGGLE TASK (WE ONLY NEED THE KEY HERE) */
     toggleTask( key){
+        let myTask = this.state.tasks[key];
+
+        // this.state.tasks[key].completed =!this.state.tasks[key].completed
+        myTask.completed = !myTask.completed;
+
+            //send out this new change to the db (ajax)
+        ajax.updateTask( myTask)
+            .then( data=>{
+                this.state.tasks[ data.task_id] = data
+                this.setState({tasks: this.state.tasks})
+            })
+
+
         //
-        this.state.tasks[key].completed =!this.state.tasks[key].completed
-        //
-        this.setState({tasks: this.state.tasks})
+        // this.setState({tasks: this.state.tasks})
     }
 
     // 90% of your components will render()
@@ -74,7 +101,7 @@ export default class App extends React.Component{
                         action={this.toggleTask.bind(this)}/>
                     </article>
 
-                {/* closeditems*/}
+                {/* Completed Items */}
 
                     <article className="col-md-6">
                         <h3>Completed Items</h3>

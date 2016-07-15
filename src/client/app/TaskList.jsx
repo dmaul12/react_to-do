@@ -11,7 +11,7 @@
             type="button"
             className="list-group-item"
             key={key}
-            index={key}
+
             onClick={
               function(){
                 props.action(key)
