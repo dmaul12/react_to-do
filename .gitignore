@@ -31,13 +31,9 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
-<<<<<<< HEAD
-.env
-=======
 
 # environmental variables
 .env
 
 # distribution files
->>>>>>> 70282eeb4d803718ad7a0055b73d79f35fac72f4
 dist
