@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "Wherein we build a to-do app in React.js",
   "main": "server.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf dist",
+    "watch" : "webpack --watch",
+    "prebuild": "npm run clean -s; npm install",
+    "build": "webpack --progress --colors",
     "start": "node server.js"
   },
   "repository": {
