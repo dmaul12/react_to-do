@@ -41,10 +41,12 @@ export default class App extends React.Component{
     addTask( newTask ){
 
         // send this change to the db (ajax)
-        ajax.createTask(newTask).then( data=>{
+        ajax.createTask(newTask)
 
+        .then( data=>{
          // when the data comes back, update the state.
-        this.state.tasks[data[0].task_id]= data[0]
+        // this.state.tasks[data[0].task_id]= data[0]
+        this.state.tasks[data.task_id]= data
         this.setState({tasks: this.state.tasks})
 
         })
@@ -72,52 +74,61 @@ export default class App extends React.Component{
                 this.state.tasks[ data.task_id] = data
                 this.setState({tasks: this.state.tasks})
             })
-
-
-        //
-        // this.setState({tasks: this.state.tasks})
     }
+
+    deleteTask(id){
+    ajax.deleteTask(id)
+      .then( task_id=>{
+        delete this.state.tasks[ task_id ];
+        this.setState({tasks: this.state.tasks})
+      })
+  }
 
     // 90% of your components will render()
     // REMEMBER you can only return **one** root element from a render fn.
     render(){
-        return(
-            <container>
-                <header>
-                < Nav/>
-                    <p>Hello world example</p>
-                </header>
-                <div className="container">
-                    <TaskForm addTask={this.addTask.bind(this)}/>
-                    <section className="row">
+         return(
+      <container>
+        <header>
+          <Nav />
+        </header>
+        <div className="container">
+          <TaskForm addTask={this.addTask.bind(this)}/>
+          <section className="row">
 
-                {/* open items*/}
+            {/*OPEN ITEMS*/}
+            <article className="col-md-6">
+              <h3>Open Items</h3>
+              <TaskList
+                list={this.state.tasks}
+                f={x=>!x}
+                action={this.toggleTask.bind(this)}/>
+            </article>
 
-                     <article className="col-md-6">
-                        <h3>Open Items</h3>
-                        <TaskList
-                        list={this.state.tasks}
-                        f={x=>!x}
-                        action={this.toggleTask.bind(this)}/>
-                    </article>
+            {/* COMPLETED ITEMS */}
+            <article className="col-md-6">
+              <h3>Completed Items</h3>
+              <TaskList
+                list={this.state.tasks}
+                f={x=>x}
+                action={this.toggleTask.bind(this)}
+                deleteTask={this.deleteTask.bind(this)}
+                >
 
-                {/* Completed Items */}
 
-                    <article className="col-md-6">
-                        <h3>Completed Items</h3>
-                        <TaskList
-                        list={this.state.tasks}
-                        f={x=>x}
-                        action={this.toggleTask.bind(this)}/>
-                    </article>
+                <a className="pull-right" ><span className="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
 
-                    </section>
-                </div>
-                <Footer/>
-            </container>
-        )
-    }
+              </TaskList>
+            </article>
+
+          </section>
+        </div>
+        <Footer />
+      </container>
+      )
+  }
 }
+
 
 // mount our App at #container
 ReactDOM.render(<App/>, document.querySelector('#container'))
